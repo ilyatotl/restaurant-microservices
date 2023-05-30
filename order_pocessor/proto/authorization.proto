@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package todo;
+option go_package = "./;pb";
+
+service AuthenticationService {
+  rpc Authorize (AuthenticationRequest) returns (AuthenticationResponse) {}
+}
+
+message AuthenticationRequest {
+  string token = 1;
+}
+
+message AuthenticationResponse {
+  int64 id = 1;
+  string role = 2;
+}
