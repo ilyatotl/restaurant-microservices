@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	"log"
 	"order_pocessor/internal/app/authentication"
 	"order_pocessor/internal/app/cooker"
 	"order_pocessor/internal/app/core"
@@ -14,8 +15,8 @@ import (
 )
 
 const (
-	port     = ":9091"
-	grpcPort = ":50051"
+	port       = ":9091"
+	grpcTarget = "172.17.0.1:50051"
 )
 
 func main() {
@@ -31,7 +32,10 @@ func main() {
 	orderRepo := order.NewOrderRepo(order.NewRepository(database))
 	dishRepo := dish.NewDishRepo(dish.NewRepository(database))
 	orderDishRepo := order_dish.NewOrderDishRepo(order_dish.NewRepository(database))
-	client, _ := authentication.NewClient(ctx, grpcPort)
+	client, err := authentication.NewClient(ctx, grpcTarget)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
 	c := core.NewCore(orderRepo, dishRepo, orderDishRepo, client)
 	r := gin.Default()

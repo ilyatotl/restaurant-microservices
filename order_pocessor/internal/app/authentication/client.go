@@ -11,8 +11,8 @@ type Client struct {
 	conn       *grpc.ClientConn
 }
 
-func NewClient(ctx context.Context, target string) (*Client, error) {
-	conn, err := grpc.DialContext(ctx, target, grpc.WithInsecure())
+func NewClient(_ context.Context, target string) (*Client, error) {
+	conn, err := grpc.Dial(target, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}

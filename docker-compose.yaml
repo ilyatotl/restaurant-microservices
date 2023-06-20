@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  authdb:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: authorization
+      POSTGRES_USER: ilya
+      POSTGRES_PASSWORD: test
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./authorization/internal/app/database/init/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+
+  auth:
+    image: auth:latest
+    restart: always
+    build:
+      context: authorization
+      dockerfile: ./Dockerfile
+    container_name: auth
+    ports:
+      - "9090:9090"
+      - "50051:50051"
+    depends_on:
+      - authdb
+
+  orderdb:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: processor
+      POSTGRES_USER: ilya
+      POSTGRES_PASSWORD: test
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./orders/internal/app/database/init/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+      - ./orders/internal/app/database/init/fill_dishes.sql:/docker-entrypoint-initdb.d/fill_dishes.sql
+
+  orders:
+    image: orders:latest
+    restart: always
+    build:
+      context: order_pocessor
+      dockerfile: ./Dockerfile
+    container_name: orders
+    ports:
+      - "9091:9091"
+    depends_on:
+      - orderdb
